@@ -1,44 +1,62 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const tempUserSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
       required: true,
     },
+
     phoneNumber: {
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
     },
+
     password: {
       type: String,
       required: true,
     },
+
     role: {
       type: String,
       enum: ["Seller", "Buyer", "Rider", "User"],
-      default: "User",
+      default: "user",
     },
+
     profileImg: {
       type: String,
       default: null,
     },
+
     registeredAt: {
       type: Date,
       default: Date.now,
     },
-    lastLogin: {
+
+    otp: {
+      type: String,
+      required: true,
+    },
+
+    otpExpires: {
       type: Date,
-      default: Date.now,
+      required: true,
+    },
+
+    verificationToken: {
+      type: String,
+      required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Enables createdAt and updatedAt fields
 );
 
-const User = mongoose.model("User", userSchema); // Fix here: Ensure export syntax
-export default User;
+const TempUser = mongoose.model("TempUser", tempUserSchema);
+
+export default TempUser;
