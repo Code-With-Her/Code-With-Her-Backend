@@ -148,7 +148,6 @@ export const verifyEmail = async (req, res) => {
 
 
 
-
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
@@ -177,11 +176,14 @@ export const loginUser = async (req, res) => {
             { expiresIn: '25m' }
         );
 
+        // Check if profileImage is populated and handle missing values
+        const profileImageUrl = user.profileImage?.url || null; // Fallback to null if no profile image
+
         // Prepare user data
         const userData = {
             name: user.fullname,
             email: user.email,
-            profileImage: user.profileImage.url, // Return only the URL of the profile image
+            profileImage: profileImageUrl,
             isAdmin: user.isAdmin,
             isVerified: user.isVerified,
             id: user._id,
@@ -196,17 +198,21 @@ export const loginUser = async (req, res) => {
         });
 
         // Respond with user details and the token
-        res.json({
+        return res.status(200).json({
             status: 'ok',
             message: 'Login successful',
             token,
             user: userData,
         });
+
+        // Commented out to prevent duplicate responses
+        // res.send(`<h1>Login successful</h1><p>Welcome, ${user.fullname}!</p>`);
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 
 
