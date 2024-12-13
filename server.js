@@ -12,7 +12,7 @@ app.use(express.json());
 connectDB();
 
 // Routes
-app.use("/api/users", userRoutes); // Specify a more descriptive route prefix
+app.use("/api", userRoutes); // Specify a more descriptive route prefix
 
 // Error handling middleware
 app.use((err, req, res, next) => {
