@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js"; // Include the .js extension fo
 import sellerRoutes from "./routes/sellerRoutes.js";
 import cookieParser from 'cookie-parser';
 import CartRoutes from "./routes/cartRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use("/api", userRoutes); // Prefix for all routes
 app.use('/api', sellerRoutes);
 app.use("/api/cart", CartRoutes);
+app.use("/api/products", productRoutes);
 
 // Home Route for testing
 app.get("/", (req, res) => {
