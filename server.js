@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import path from "path"; // Import path module
 import connectDB from "./config/db.js"; // Import the DB connection
 import userRoutes from "./routes/userRoutes.js"; // Include the .js extension for ES Modules
+import sellerRoutes from "./routes/sellerRoutes.js";
+import cookieParser from 'cookie-parser';
+
 
 dotenv.config();
 
@@ -17,9 +20,11 @@ app.use(express.json());
 
 // Connect to the database
 connectDB();
+app.use(cookieParser());
 
 // Routes
 app.use("/api", userRoutes); // Prefix for all routes
+app.use('/api', sellerRoutes);
 
 // Home Route for testing
 app.get("/", (req, res) => {

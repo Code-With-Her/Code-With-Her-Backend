@@ -214,6 +214,14 @@ export const loginUser = async (req, res) => {
             sameSite: 'Strict', // Mitigates CSRF attacks
         });
 
+        // Optionally set the user data in cookies (make sure not to put sensitive information like password)
+        res.cookie('user', JSON.stringify(userData), {
+            httpOnly: false, // You can change this to true if you don't need to access it in JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensure cookie is sent over HTTPS in production
+            expires: new Date(Date.now() + 25 * 60 * 1000), // Cookie expiration (same as token)
+            sameSite: 'Strict', // Mitigates CSRF attacks
+        });
+
         // Respond with user details and the token
         return res.status(200).json({
             status: 'ok',
