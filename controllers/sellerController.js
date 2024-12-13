@@ -142,3 +142,26 @@ export const getProductsBySeller = async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Server error' });
     }
 };
+
+export const getAllProducts = async (req, res) => {
+    try {
+        // Fetch all products from the Product collection
+        const products = await Product.find().populate('seller', 'farmName location');
+
+        // Check if products exist
+        if (products.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'No products found',
+            });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            products,
+        });
+    } catch (error) {
+        console.error('Error fetching all products:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+};
