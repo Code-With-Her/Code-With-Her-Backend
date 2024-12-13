@@ -16,12 +16,11 @@ cloudinary.config({
   });
 
   
-// Register user controller
-export const registerUser = async (req, res) => {
-    const { fullname, email, password, phone, bio } = req.body;
+  export const registerUser = async (req, res) => {
+    const { fullname, email, password, phone, bio, latitude, longitude, roles } = req.body;
 
     // Check for required fields
-    if (!fullname || !email || !password || !phone || !bio) {
+    if (!fullname || !email || !password || !phone || !bio || !latitude || !longitude || !roles) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -66,6 +65,11 @@ export const registerUser = async (req, res) => {
             otp,
             profileImage: uploadedImage?._id,
             otpExpires: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
+            location: {
+                type: "Point", // GeoJSON type
+                coordinates: [longitude, latitude], // GeoJSON coordinates [longitude, latitude]
+            },
+            roles, // Roles like ['Seller', 'Buyer', 'Rider', 'User']
         });
 
         await tempUser.save();
@@ -100,6 +104,7 @@ export const registerUser = async (req, res) => {
     }
 };
 
+
 export const verifyEmail = async (req, res) => {
     const { token, otp } = req.query;
 
@@ -132,6 +137,8 @@ export const verifyEmail = async (req, res) => {
             password: tempUser.password,
             profileImage: tempUser.profileImage,
             isVerified: true,
+            location: tempUser.location, // Copy location from TempUser
+            roles: tempUser.roles, // Copy roles from TempUser
         });
 
         await newUser.save();
@@ -148,8 +155,14 @@ export const verifyEmail = async (req, res) => {
 
 
 
+
 export const loginUser = async (req, res) => {
     const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+    }
 
     try {
         // Find the user by email and populate the profileImage field
@@ -179,6 +192,9 @@ export const loginUser = async (req, res) => {
         // Check if profileImage is populated and handle missing values
         const profileImageUrl = user.profileImage?.url || null; // Fallback to null if no profile image
 
+        // Extract location data if available
+        const userLocation = user.location || null; // This will return the location object or null if not available
+
         // Prepare user data
         const userData = {
             name: user.fullname,
@@ -187,14 +203,15 @@ export const loginUser = async (req, res) => {
             isAdmin: user.isAdmin,
             isVerified: user.isVerified,
             id: user._id,
+            location: userLocation, // Include location data in the response
         };
 
         // Set the token in an HttpOnly cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: process.env.NODE_ENV === 'production', // Ensure cookie is sent over HTTPS in production
             expires: new Date(Date.now() + 25 * 60 * 1000), // Cookie expiration (25 minutes)
-            sameSite: 'Strict',
+            sameSite: 'Strict', // Mitigates CSRF attacks
         });
 
         // Respond with user details and the token
@@ -202,17 +219,13 @@ export const loginUser = async (req, res) => {
             status: 'ok',
             message: 'Login successful',
             token,
-            user: userData,
+            user: userData, // Include location data here
         });
-
-        // Commented out to prevent duplicate responses
-        // res.send(`<h1>Login successful</h1><p>Welcome, ${user.fullname}!</p>`);
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ message: 'Server error' });
     }
 };
-
 
 
 
