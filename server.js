@@ -1,35 +1,49 @@
 import express from "express";
 import dotenv from "dotenv";
-import path from "path"; // Import path module
-import connectDB from "./config/db.js"; // Import the DB connection
-import userRoutes from "./routes/userRoutes.js"; // Include the .js extension for ES Modules
+import path from "path";
+import connectDB from "./config/db.js";
+import userRoutes from "./routes/userRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
-import cookieParser from 'cookie-parser';
-import CartRoutes from "./routes/cartRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
+// Load environment variables
 dotenv.config();
 
+// Initialize the Express app
 const app = express();
 
-// Set EJS as the templating engine
-app.set('view engine', 'ejs'); // Set EJS as the view engine
-app.set('views', './views'); // Specify the views directory
-
-// Middleware to parse JSON bodies
+// Middleware: Parse JSON bodies
 app.use(express.json());
 
-// Connect to the database
-connectDB();
+// Middleware: Parse cookies
 app.use(cookieParser());
 
-// Routes
-app.use("/api", userRoutes); // Prefix for all routes
-app.use('/api', sellerRoutes);
-app.use("/api/cart", CartRoutes);
-app.use("/api/products", productRoutes);
+// Middleware: Handle CORS
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow frontend origin
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Allow cookies/auth headers
+  })
+);
 
-// Home Route for testing
+// Set up the database connection
+connectDB();
+
+// Set EJS as the templating engine
+app.set("view engine", "ejs");
+app.set("views", path.resolve("views")); // Use path.resolve for cross-platform compatibility
+
+// Define routes
+app.use("/api", userRoutes); // Group user-related routes under /users
+app.use("/api/sellers", sellerRoutes); // Group seller-related routes under /sellers
+app.use("/api/cart", cartRoutes); // Cart-related routes
+app.use("/api/products", productRoutes); // Product-related routes
+
+// Root route for testing
 app.get("/", (req, res) => {
   res.send("Welcome to the API");
 });
@@ -50,5 +64,8 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+// Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -65,7 +65,7 @@ router.get('/users/paginated', getPaginatedUsers);
 router.delete('/users/delete', deleteUser);
 
 // Update User
-router.put('/users/update/:id', updateUser); // New route for updating user
+router.put('/update/:id', updateUser); // New route for updating user
 
 // Upload Image
 router.post('/images', uploadImage);
