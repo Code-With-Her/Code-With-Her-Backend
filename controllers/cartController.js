@@ -1,9 +1,10 @@
-import { Cart } from "../models/Cart.js";
-import  Product  from "../models/Products.js";
+import Cart from "../models/Cart.js";
+import Product from "../models/Products.js";
 
 // Add a product to the cart
 export const addToCart = async (req, res) => {
-  const { userId, productId, quantity } = req.body;
+  const userId = req.user.id;  // Get userId from the verified token or cookies
+  const { productId, quantity } = req.body;
 
   try {
     // Check if product exists
@@ -52,7 +53,7 @@ export const addToCart = async (req, res) => {
 
 // Get user's cart
 export const getCart = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;  // Get userId from the verified token or cookies
 
   try {
     const cart = await Cart.findOne({ user: userId }).populate(
@@ -72,7 +73,8 @@ export const getCart = async (req, res) => {
 
 // Update product quantity in cart
 export const updateCart = async (req, res) => {
-  const { userId, productId, quantity } = req.body;
+  const userId = req.user.id;  // Get userId from the verified token or cookies
+  const { productId, quantity } = req.body;
 
   try {
     const cart = await Cart.findOne({ user: userId });
@@ -107,7 +109,8 @@ export const updateCart = async (req, res) => {
 
 // Remove product from cart
 export const removeFromCart = async (req, res) => {
-  const { userId, productId } = req.body;
+  const userId = req.user.id;  // Get userId from the verified token or cookies
+  const { productId } = req.body;
 
   try {
     const cart = await Cart.findOne({ user: userId });
@@ -136,7 +139,7 @@ export const removeFromCart = async (req, res) => {
 
 // Clear cart
 export const clearCart = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;  // Get userId from the verified token or cookies
 
   try {
     const cart = await Cart.findOne({ user: userId });
