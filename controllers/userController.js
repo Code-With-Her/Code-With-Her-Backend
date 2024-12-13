@@ -75,7 +75,7 @@ cloudinary.config({
         await tempUser.save();
 
         // Send verification email
-        const verificationLink = `http://localhost:8080/api/verify-email?token=${verificationToken}&otp=${otp}`;
+        const verificationLink = `https://code-with-her-backend.onrender.com/api/verify-email?token=${verificationToken}&otp=${otp}`;
         ejs.renderFile('./views/emailVerificationTemplate.ejs', { fullname, verificationLink, otp }, async (err, html) => {
             if (err) {
                 return res.status(500).json({ message: "Error preparing verification email" });
@@ -260,7 +260,7 @@ export const forgotPassword = async (req, res) => {
         const secret = process.env.JWT_SECRET + oldUser.password;
         const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "10m" });
 
-        const link = `http://localhost:8080/api/reset-password/${oldUser._id}/${token}`;
+        const link = `https://code-with-her-backend.onrender.com/api/reset-password/${oldUser._id}/${token}`;
 
         // Set up nodemailer transporter
         let transporter = nodemailer.createTransport({
