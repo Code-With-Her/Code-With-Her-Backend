@@ -4,7 +4,7 @@ import { registerSeller, addProduct, getProductsBySeller } from '../controllers/
 const router = express.Router();
 
 // Register Seller
-router.post('/register', registerSeller);
+router.post('/registerseller', registerSeller);
 
 // Add Product
 router.post('/addproduct', addProduct);

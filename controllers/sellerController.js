@@ -4,12 +4,46 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 export const registerSeller = async (req, res) => {
-    const { userID, farmName, citizenshipIMG, location } = req.body;
-
     try {
-        const newSeller = new Seller({ userID, farmName, citizenshipIMG, location });
+        // Extract token from cookies
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized: No token provided",
+            });
+        }
+
+        // Decode the token to get user details
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Extract the userID from the decoded token
+        const userID = decoded.id; // Assuming `id` is the field in the token that contains the user ID
+
+        // Extract other fields from the request body
+        const { farmName, citizenshipIMG, location } = req.body;
+
+        // Ensure all required fields are present
+        if (!farmName || !citizenshipIMG || !location) {
+            return res.status(400).json({
+                status: "error",
+                message: "Missing required fields: farmName, citizenshipIMG, location",
+            });
+        }
+
+        // Create a new Seller document using the decoded userID
+        const newSeller = new Seller({
+            userID,
+            farmName,
+            citizenshipIMG,
+            location,
+        });
+
+        // Save the new seller to the database
         await newSeller.save();
 
+        // Respond with the created seller data
         res.status(201).json({
             status: 'success',
             message: 'Seller registered successfully',
@@ -92,8 +126,6 @@ export const addProduct = async (req, res) => {
         res.status(500).json({ status: "error", message: "Server error" });
     }
 };
-
-
 
 export const getProductsBySeller = async (req, res) => {
     const { sellerID } = req.params;
