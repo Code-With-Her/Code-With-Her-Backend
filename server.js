@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
+import connectDB from "./config/db.js"; // Import the DB connection
 import userRoutes from "./routes/userRoutes.js"; // Include the .js extension for ES Modules
 
 dotenv.config();
@@ -8,14 +8,8 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Database connection
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err.message);
-    process.exit(1); // Exit the application if DB connection fails
-  });
+// Connect to the database
+connectDB();
 
 // Routes
 app.use("/api/users", userRoutes); // Specify a more descriptive route prefix
