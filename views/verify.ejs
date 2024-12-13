@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            background-color: #3e0e0e;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 350px;
+        }
+        h1 {
+            font-size: 26px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #b0b0b0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 6px;
+            background: #6a5acd;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.5);
+        }
+        .btn:hover {
+            background-color: #574bbd;
+            box-shadow: 0 6px 20px rgba(87, 75, 189, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Verification</h1>
+        <p><%= message %></p>
+        <a href="https://touristnepal.vercel.app/login" class="btn">Login Now</a>
+    </div>
+</body>
+</html>

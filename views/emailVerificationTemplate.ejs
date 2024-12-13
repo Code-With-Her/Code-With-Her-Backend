@@ -1,0 +1,62 @@
+
+<!-- views/emailVerificationTemplate.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            background-color: #f3f4f6; /* Light background color */
+            font-family: 'Roboto', sans-serif; /* Use your preferred font */
+            color: #1f2937; /* Dark text color */
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: #ffffff; /* White background for the container */
+            padding: 30px; /* Increased padding for a spacious look */
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        h1 {
+            color: #634da3; /* Your theme color */
+            font-size: 28px; /* Increased font size for the title */
+            margin-bottom: 20px; /* Space below the title */
+        }
+        .button {
+            background-color: #634da3; /* Button color matching theme */
+            color: white; /* Button text color */
+            padding: 12px 40px; /* Increased button width */
+            text-decoration: none;
+            border-radius: 6px; /* Slightly more rounded corners */
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s; /* Smooth transition for hover */
+        }
+        .button:hover {
+            background-color: #7c5dd4; /* Lighter shade on hover */
+        }
+        p {
+            font-size: 16px; /* Standard text size */
+            margin: 10px 0; /* Vertical spacing for paragraphs */
+        }
+        .verify-text {
+            color: white; /* Set verification text color to white */
+            font-weight: bold; /* Make it bold */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Email Verification</h1>
+        <p>Thank you for registering, <%= fullname %>! Please verify your email:</p>
+        <a href="<%= verificationLink %>" class="button"><span class="verify-text">Verify Your Email</span></a>
+        <p>This link will expire in 1 day.</p>
+    </div>
+</body>
+</html>
