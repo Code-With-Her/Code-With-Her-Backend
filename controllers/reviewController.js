@@ -64,3 +64,29 @@ export const createReview = async (req, res) => {
   }
 };
 
+
+export const getReviewsBySellerId = async (req, res) => {
+    try {
+      const { sellerId } = req.params; // Get the seller ID from the URL parameter
+  
+      // Check if the seller exists
+      const seller = await Seller.findById(sellerId);
+      if (!seller) {
+        return res.status(404).json({ message: 'Seller not found' });
+      }
+  
+      // Get all reviews for the seller
+      const reviews = await Review.find({ seller: sellerId })
+        .populate('user', 'username email') // Populate user details (optional)
+        .sort({ createdAt: -1 }); // Sort by most recent reviews
+  
+      if (reviews.length === 0) {
+        return res.status(404).json({ message: 'No reviews found for this seller' });
+      }
+  
+      res.status(200).json({ reviews });
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
