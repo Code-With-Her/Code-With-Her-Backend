@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 
 export const registerSeller = async (req, res) => {
     try {
-        // Extract token from cookies
-        const token = req.cookies.token;
+        // Extract token from Authorization header
+        const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
 
         if (!token) {
             return res.status(401).json({
@@ -54,6 +54,7 @@ export const registerSeller = async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Server error' });
     }
 };
+
 
 export const addProduct = async (req, res) => {
     try {
