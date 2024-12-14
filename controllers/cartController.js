@@ -61,20 +61,40 @@ export const getCart = async (req, res) => {
   const userId = req.user.id;  // Get userId from the verified token or cookies
 
   try {
+    // Fetch cart data for the user
     const cart = await Cart.findOne({ user: userId }).populate(
-      "products.product",
-      "name price"
+      "products.product", // Populate the product details
+      "name price"         // Only select the name and price fields
     );
 
+    // If cart is not found, return a 404 error
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+      return res.status(404).json({
+        status: "fail",
+        message: "Cart not found"
+      });
     }
 
-    res.status(200).json(cart);
+    // Calculate total price from the cart products
+    const totalPrice = cart.products.reduce(
+      (total, product) => total + product.product.price * product.quantity,
+      0
+    );
+
+    // Return the cart details along with total price
+    res.status(200).json({
+      status: "success",
+      cart,
+      totalPrice, // Send the total price as well
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      status: "fail",
+      message: error.message,
+    });
   }
 };
+
 
 // Update product quantity in cart
 export const updateCart = async (req, res) => {

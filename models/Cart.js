@@ -1,17 +1,19 @@
+// models/Cart.js
 import mongoose from "mongoose";
+import Products from "./Products.js"; // Correctly importing the Products model
 
 const cartSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User", // Referencing the User model
       required: true,
     },
     products: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+          ref: "Products", // Referencing the correct "Products" model
           required: true,
         },
         quantity: {

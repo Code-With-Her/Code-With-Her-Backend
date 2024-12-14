@@ -9,6 +9,7 @@ import productRoutes from "./routes/productRoutes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api/sellers", sellerRoutes); // Group seller-related routes under /sel
 app.use("/api/cart", cartRoutes); // Cart-related routes
 app.use("/api/products", productRoutes); // Product-related routes
 app.use("/api/reviews",reviewRoutes);
+app.use("/api/payment", paymentRoutes);
 // Root route for testing
 app.get("/", (req, res) => {
   res.send("Welcome to the API");

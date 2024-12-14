@@ -81,7 +81,7 @@ export const getReviewsBySellerId = async (req, res) => {
         .sort({ createdAt: -1 }); // Sort by most recent reviews
   
       if (reviews.length === 0) {
-        return res.status(404).json({ message: 'No reviews found for this seller' });
+        return res.status(200).json({ message: 'No reviews found for this seller' }); // Changed to status 200 with a message
       }
   
       res.status(200).json({ reviews });
@@ -90,3 +90,4 @@ export const getReviewsBySellerId = async (req, res) => {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
+  

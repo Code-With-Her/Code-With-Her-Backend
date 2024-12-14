@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/add", verifyUser, addToCart);
 
 // Get user's cart
-router.get("/", verifyUser, getCart);  // No need for userId in the params, we get it from cookies
+router.get("/status", verifyUser, getCart);  // No need for userId in the params, we get it from cookies
 
 // Update product quantity in cart
 router.put("/update", verifyUser, updateCart);  // No need for userId in the body, we get it from cookies
