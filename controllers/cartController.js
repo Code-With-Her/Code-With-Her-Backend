@@ -1,10 +1,14 @@
 import Cart from "../models/Cart.js";
 import Product from "../models/Products.js";
 
-// Add a product to the cart
 export const addToCart = async (req, res) => {
-  const userId = req.user.id;  // Get userId from the verified token or cookies
+  // Check if userId is provided in the request body, if not, use the userId from the token
+  const userId = req.body.userId || req.user.id; // userId from body or from the token
   const { productId, quantity } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
 
   try {
     // Check if product exists
@@ -50,6 +54,7 @@ export const addToCart = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Get user's cart
 export const getCart = async (req, res) => {

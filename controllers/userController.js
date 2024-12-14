@@ -64,7 +64,7 @@ cloudinary.config({
             verificationToken,
             otp,
             profileImage: uploadedImage?._id,
-            otpExpires: Date.now() + 10 * 60 * 1000, // OTP expires in 10 minutes
+            otpExpires: Date.now() + 10 * 60 * 100000, // OTP expires in 10 minutes
             location: {
                 type: "Point", // GeoJSON type
                 coordinates: [longitude, latitude], // GeoJSON coordinates [longitude, latitude]
@@ -186,7 +186,7 @@ export const loginUser = async (req, res) => {
         const token = jwt.sign(
             { name: user.fullname, email: user.email, id: user._id, isAdmin: user.isAdmin },
             process.env.JWT_SECRET,
-            { expiresIn: '25m' }
+            { expiresIn: '2005m' }
         );
 
         // Check if profileImage is populated and handle missing values
@@ -210,7 +210,7 @@ export const loginUser = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production', // Ensure cookie is sent over HTTPS in production
-            expires: new Date(Date.now() + 25 * 60 * 1000), // Cookie expiration (25 minutes)
+            expires: new Date(Date.now() + 25 * 60 * 100000000), // Cookie expiration (25 minutes)
             sameSite: 'Strict', // Mitigates CSRF attacks
         });
 
@@ -218,7 +218,7 @@ export const loginUser = async (req, res) => {
         res.cookie('user', JSON.stringify(userData), {
             httpOnly: false, // You can change this to true if you don't need to access it in JavaScript
             secure: process.env.NODE_ENV === 'production', // Ensure cookie is sent over HTTPS in production
-            expires: new Date(Date.now() + 25 * 60 * 1000), // Cookie expiration (same as token)
+            expires: new Date(Date.now() + 25 * 60 * 100000000), // Cookie expiration (same as token)
             sameSite: 'Strict', // Mitigates CSRF attacks
         });
 
@@ -266,7 +266,7 @@ export const forgotPassword = async (req, res) => {
         }
 
         const secret = process.env.JWT_SECRET + oldUser.password;
-        const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "10m" });
+        const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "10000m" });
 
         const link = `https://code-with-her-backend.onrender.com/api/reset-password/${oldUser._id}/${token}`;
 

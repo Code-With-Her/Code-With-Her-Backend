@@ -55,12 +55,43 @@ export const registerSeller = async (req, res) => {
     }
 };
 
+export const getAllSellers = async (req, res) => {
+    try {
+        // Fetch all sellers from the database
+        const sellers = await Seller.find();
 
+        // Count the total number of sellers
+        const totalSellers = await Seller.countDocuments();
+
+        // Respond with the list of sellers and the total count
+        res.status(200).json({
+            status: 'success',
+            message: 'All sellers retrieved successfully',
+            totalSellers,
+            sellers,
+        });
+    } catch (error) {
+        console.error('Error retrieving sellers:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+};
+
+
+// Add product controller
 export const addProduct = async (req, res) => {
     try {
         // Extract token from cookies
-        const token = req.cookies.token;
+        let token = req.cookies.token;
 
+        // If token is not in cookies, check Authorization header
+        if (!token) {
+            const authHeader = req.headers['authorization'];
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];  // Extract token after "Bearer "
+            }
+        }
+
+        // If no token is provided in either cookies or header, return Unauthorized
         if (!token) {
             return res.status(401).json({
                 status: "error",
@@ -128,11 +159,20 @@ export const addProduct = async (req, res) => {
     }
 };
 
+// Get products by seller controller
 export const getProductsBySeller = async (req, res) => {
     const { sellerID } = req.params;
 
     try {
-        const products = await Product.find({ sellerID }).populate('sellerID', 'farmName location');
+        // Ensure we use the correct field `seller` as in your schema
+        const products = await Product.find({ seller: sellerID }).populate('seller', 'farmName location');
+
+        if (products.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'No products found for this seller',
+            });
+        }
 
         res.status(200).json({
             status: 'success',
@@ -144,10 +184,40 @@ export const getProductsBySeller = async (req, res) => {
     }
 };
 
+// Get all products with pagination
 export const getAllProducts = async (req, res) => {
     try {
-        // Fetch all products from the Product collection
-        const products = await Product.find().populate('seller', 'farmName location');
+        // Extract token from cookies
+        let token = req.cookies.token;
+
+        // If token is not in cookies, check Authorization header
+        if (!token) {
+            const authHeader = req.headers['authorization'];
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];  // Extract token after "Bearer "
+            }
+        }
+
+        // If no token is provided in either cookies or header, return Unauthorized
+        if (!token) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized: No token provided",
+            });
+        }
+
+        // Decode the token to get user details
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Log the decoded user details to ensure the userID is being decoded correctly
+        console.log("Decoded user ID:", decoded.id); // Debugging log
+
+        const userID = decoded.id;
+
+        // Fetch all products, sorted by the latest created (by 'createdAt' in descending order)
+        const products = await Product.find()
+            .populate('seller', 'farmName location')
+            .sort({ createdAt: -1 });  // Sorting by 'createdAt' in descending order (latest first)
 
         // Check if products exist
         if (products.length === 0) {
@@ -164,5 +234,63 @@ export const getAllProducts = async (req, res) => {
     } catch (error) {
         console.error('Error fetching all products:', error);
         res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+};
+
+
+// Get a single product by ID
+export const getSingleProduct = async (req, res) => {
+    try {
+        // Extract token from cookies
+        let token = req.cookies.token;
+
+        // If token is not in cookies, check Authorization header
+        if (!token) {
+            const authHeader = req.headers['authorization'];
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];  // Extract token after "Bearer "
+            }
+        }
+
+        // If no token is provided in either cookies or header, return Unauthorized
+        if (!token) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized: No token provided",
+            });
+        }
+
+        // Decode the token to get user details
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Log the decoded user details to ensure the userID is being decoded correctly
+        console.log("Decoded user ID:", decoded.id); // Debugging log
+
+        const userID = decoded.id;
+
+        // Fetch the product by ID
+        const productId = req.params.id;  // Get the product ID from the URL parameter
+        const product = await Product.findById(productId)
+            .populate('seller', 'farmName location');  // Populate seller details if necessary
+
+        // If the product is not found
+        if (!product) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Product not found',
+            });
+        }
+
+        // Respond with the product details
+        res.status(200).json({
+            status: 'success',
+            product,
+        });
+    } catch (error) {
+        console.error('Error fetching single product:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Server error',
+        });
     }
 };
