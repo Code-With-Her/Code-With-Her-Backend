@@ -76,6 +76,36 @@ export const getAllSellers = async (req, res) => {
     }
 };
 
+//
+ export const getSellerById = async (req, res) => {
+    try {
+        // Extract the seller ID from the request parameters
+        const { id } = req.params;
+
+        // Find the seller in the database
+        const seller = await Seller.findById(id);
+
+        // If no seller is found, return a 404 response
+        if (!seller) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Seller not found',
+            });
+        }
+
+        // Respond with the seller data
+        res.status(200).json({
+            status: 'success',
+            message: 'Seller retrieved successfully',
+            seller,
+        });
+    } catch (error) {
+        console.error('Error retrieving seller:', error);
+        res.status(500).json({ status: 'error', message: 'Server error' });
+    }
+};
+
+
 
 // Add product controller
 export const addProduct = async (req, res) => {
