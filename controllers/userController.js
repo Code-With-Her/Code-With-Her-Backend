@@ -19,13 +19,11 @@ cloudinary.config({
   export const registerUser = async (req, res) => {
     const { fullname, email, password, phone, bio, latitude, longitude, roles } = req.body;
 
-    // Check for required fields
     if (!fullname || !email || !password || !phone || !bio || !latitude || !longitude || !roles) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        // Check if user or temp user already exists
         const existingUser = await UserModel.findOne({ email });
         const existingTempUser = await TempUserModel.findOne({ email });
 
@@ -33,28 +31,25 @@ cloudinary.config({
             return res.status(400).json({ message: "User already exists" });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        const otp = crypto.randomInt(100000, 999999).toString(); // Generate a random OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
 
-        // Handle optional image upload
         let uploadedImage = null;
         if (req.file) {
             try {
-                const uploadResponse = await cloudinary.uploader.upload(req.file.path); // Upload to Cloudinary
+                const uploadResponse = await cloudinary.uploader.upload(req.file.path);
                 const newImage = new ImgModel({
                     url: uploadResponse.secure_url,
                     publicId: uploadResponse.public_id,
                     altText: "Profile image",
                 });
-                uploadedImage = await newImage.save(); // Save image to database
+                uploadedImage = await newImage.save();
             } catch (error) {
                 return res.status(500).json({ message: "Image upload failed", error: error.message });
             }
         }
 
-        // Create a temporary user record
         const tempUser = new TempUserModel({
             fullname,
             email,
@@ -64,45 +59,50 @@ cloudinary.config({
             verificationToken,
             otp,
             profileImage: uploadedImage?._id,
-            otpExpires: Date.now() + 10 * 60 * 100000, // OTP expires in 10 minutes
+            otpExpires: Date.now() + 10 * 60 * 1000, // Fixed to 10 minutes
             location: {
-                type: "Point", // GeoJSON type
-                coordinates: [longitude, latitude], // GeoJSON coordinates [longitude, latitude]
+                type: "Point",
+                coordinates: [longitude, latitude],
             },
-            roles, // Roles like ['Seller', 'Buyer', 'Rider', 'User']
+            roles,
         });
 
         await tempUser.save();
 
-        // Send verification email
         const verificationLink = `https://code-with-her-backend.onrender.com/api/verify-email?token=${verificationToken}&otp=${otp}`;
+
         ejs.renderFile('./views/emailVerificationTemplate.ejs', { fullname, verificationLink, otp }, async (err, html) => {
             if (err) {
-                return res.status(500).json({ message: "Error preparing verification email" });
+                return res.status(500).json({ message: "Error preparing verification email", error: err.message });
             }
 
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-            });
+            try {
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS,
+                    },
+                });
 
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
-                to: email,
-                subject: "Verify Your Email",
-                html: html,
-            });
+                await transporter.sendMail({
+                    from: process.env.EMAIL_USER,
+                    to: email,
+                    subject: "Verify Your Email",
+                    html: html,
+                });
 
-            // Send success response
-            res.status(201).json({ message: "User registered successfully! Please verify your email." });
+                res.status(201).json({ message: "User registered successfully! Please verify your email." });
+            } catch (emailError) {
+                return res.status(500).json({ message: "Error sending verification email", error: emailError.message });
+            }
         });
+
     } catch (error) {
         res.status(500).json({ message: "Server error during registration", error: error.message });
     }
 };
+
 
 
 export const verifyEmail = async (req, res) => {

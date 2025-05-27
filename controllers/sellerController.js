@@ -217,55 +217,38 @@ export const getProductsBySeller = async (req, res) => {
 // Get all products with pagination
 export const getAllProducts = async (req, res) => {
     try {
-        // Extract token from cookies
-        let token = req.cookies.token;
-
-        // If token is not in cookies, check Authorization header
-        if (!token) {
-            const authHeader = req.headers['authorization'];
-            if (authHeader && authHeader.startsWith('Bearer ')) {
-                token = authHeader.split(' ')[1];  // Extract token after "Bearer "
-            }
-        }
-
-        // If no token is provided in either cookies or header, return Unauthorized
-        if (!token) {
-            return res.status(401).json({
-                status: "error",
-                message: "Unauthorized: No token provided",
-            });
-        }
-
-        // Decode the token to get user details
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Log the decoded user details to ensure the userID is being decoded correctly
-        console.log("Decoded user ID:", decoded.id); // Debugging log
-
-        const userID = decoded.id;
-
-        // Fetch all products, sorted by the latest created (by 'createdAt' in descending order)
-        const products = await Product.find()
-            .populate('seller', 'farmName location')
-            .sort({ createdAt: -1 });  // Sorting by 'createdAt' in descending order (latest first)
-
-        // Check if products exist
-        if (products.length === 0) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'No products found',
-            });
-        }
-
-        res.status(200).json({
-            status: 'success',
-            products,
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] Incoming request to get all products`);
+  
+      // Fetch all products, sorted by latest created
+      const products = await Product.find()
+        .populate('seller', 'farmName location')
+        .sort({ createdAt: -1 });
+  
+      // If no products found
+      if (products.length === 0) {
+        console.warn(`[${timestamp}] No products found in the database`);
+  
+        return res.status(404).json({
+          status: 'error',
+          message: 'No products found',
         });
+      }
+  
+      console.log(`[${timestamp}] ${products.length} products retrieved successfully`);
+  
+      res.status(200).json({
+        status: 'success',
+        products,
+      });
     } catch (error) {
-        console.error('Error fetching all products:', error);
-        res.status(500).json({ status: 'error', message: 'Server error' });
+      const timestamp = new Date().toISOString();
+      console.error(`[${timestamp}] Error fetching all products:`, error);
+      res.status(500).json({ status: 'error', message: 'Server error' });
     }
-};
+  };
+  
+  
 
 
 // Get a single product by ID
