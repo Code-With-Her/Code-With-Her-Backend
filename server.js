@@ -26,7 +26,7 @@ app.use(cookieParser());
 // Middleware: Handle CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173" ||"https://code-with-her-frontend-production.up.railway.app/signup", // Allow frontend origin
+    origin: process.env.CLIENT_URL || "http://localhost:5173" ||"https://code-with-her-frontend-production.up.railway.app/signup" ||"https://codewither.vercel.app", // Allow frontend origin
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // Allow cookies/auth headers
   })
